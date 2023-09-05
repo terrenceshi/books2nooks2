@@ -20,7 +20,7 @@ function App() {
       <CssBaseline />
         <Navbar/>
 
-        <Typography variant="h1" align = "center" sx = {{p: 2}}>
+        <Typography variant="h1" align = "center" sx = {{p: 3}}>
           From Books to Nooks
         </Typography>
 

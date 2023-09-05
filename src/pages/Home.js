@@ -1,6 +1,11 @@
-import { Typography, Autocomplete, TextField, Button, Box } from '@mui/material';
+import { useState } from 'react';
+
+import { Typography, Autocomplete, TextField, Button, Box, Skeleton } from '@mui/material';
 
 function Home() {
+    const [loading, setLoading] = useState(false);
+    const [resultsLoaded, setResultsLoaded] = useState(false);
+
     const top100Films = [
         { label: 'The Shawshank Redemption', year: 1994 },
         { label: 'The Godfather', year: 1972 },
@@ -20,35 +25,51 @@ function Home() {
             display: "flex", 
             flexDirection: "column", 
             alignItems: "center",
-            gap: 2
+            gap: 3,
+            pb: 16
         }}>
-            <Box>
-                <Autocomplete
-                    disablePortal
-                    options={top100Films}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="Movie" />}
-                />
+            <Autocomplete
+                disablePortal
+                options={top100Films}
+                sx={{ width: 700 }}
+                renderInput={(params) => <TextField {...params} label="Enter a book title" variant="outlined"/>}
+            />
 
-                <Button
-                    variant="contained"
-                    sx = {{ }}
-                >
+            <Box>
+                <Button variant="contained">
                     Generate Playlist
                 </Button>
             </Box>
 
-            <Box>
-                <iframe
-                    title = "myFrame"
-                    src="https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"
-                    width = {700} 
-                    height="380" 
-                    frameBorder="0" 
-                    allowtransparency="true"
-                />
+            <Skeleton 
+                variant="rounded" 
+                width={700} 
+                height={400} 
+                sx = {{
+                    borderRadius: 4,
+                    display: loading ? "block" : "none"
+                }}
+            />
 
-                <Typography variant = "h5">
+            <Box sx = {{
+                display: resultsLoaded ? "flex" : "none",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 3
+            }}>
+                <Box>
+                    <iframe
+                        title = "myFrame"
+                        src="https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"
+                        width = {700} 
+                        height="400" 
+                        frameBorder="0" 
+                        allowtransparency="true"
+                    />
+                    
+                </Box>
+
+                <Typography variant = "h6">
                     Don't like what you see?
                 </Typography>
 
@@ -56,7 +77,7 @@ function Home() {
                     disablePortal
                     options={top100Films}
                     sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="Movie" />}
+                    renderInput={(params) => <TextField {...params} label="Enter your favorite genre" />}
                 />
 
                 <Button

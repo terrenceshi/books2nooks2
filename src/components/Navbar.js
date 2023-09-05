@@ -23,8 +23,7 @@ function Navbar () {
             p: 2,
             flexDirection: 'row',
             alignItems: 'center',
-            background: 'linear-gradient(120deg, #3961bb, #9a3dbc)',
-            width: "100vw"
+            background: 'linear-gradient(120deg, #3961bb, #9a3dbc)'
         }}>
             {pages.map((page) => (
             <Button
