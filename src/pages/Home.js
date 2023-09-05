@@ -1,10 +1,24 @@
 import { useState } from 'react';
 
 import { Typography, Autocomplete, TextField, Button, Box, Skeleton } from '@mui/material';
+import { csv } from 'd3-request';
+import url from "../data/book_data.csv";
+
+var bookData;
+
+csv(url, function(err, data) {
+    bookData = data.map((entry) => {
+        return entry.title;
+    });
+    console.log("book csv loaded")
+})
 
 function Home() {
     const [loading, setLoading] = useState(false);
     const [resultsLoaded, setResultsLoaded] = useState(false);
+
+    const [disabledBtn, setDisabledBtn] = useState(true);
+    const [inputValue, setInputValue] = useState("");
 
     const top100Films = [
         { label: 'The Shawshank Redemption', year: 1994 },
@@ -36,7 +50,7 @@ function Home() {
             />
 
             <Box>
-                <Button variant="contained">
+                <Button variant="contained" disabled = {disabledBtn}>
                     Generate Playlist
                 </Button>
             </Box>
