@@ -33,6 +33,7 @@ function Home({bookData}) {
             pb: 16
         }}>
             <Autocomplete
+                disableClearable
                 open={open}
                 onClose={() => setOpen(false)}
                 onChange={(event, value) => {
@@ -40,7 +41,7 @@ function Home({bookData}) {
                     setDisabledBtn(false);
                 }}
                 onInputChange={(event, value) => {
-                    setInputValue(value);
+                    setDisabledBtn(true);
                     if (value.length > 2) {
                         setOpen(true);
                     } else {
@@ -49,11 +50,11 @@ function Home({bookData}) {
                 }}
                 options={bookData}
                 sx={{ width: 700 }}
-                renderInput={(params) => <TextField {...params} label="Enter a book title" variant="outlined"/>}
+                renderInput={(params) => <TextField {...params} label="Enter a book title" variant="outlined" />}
             />
 
             <Box>
-                <Button variant="contained" disabled = {disabledBtn} onClick = {() => console.log(inputValue)}>
+                <Button variant="contained" disabled = {disabledBtn || inputValue === null} onClick = {() => console.log(inputValue)}>
                     Generate Playlist
                 </Button>
             </Box>

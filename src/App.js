@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 
 import Navbar from "./components/Navbar.js";
+import FakeLanding from "./components/FakeLanding.js";
 import Home from "./pages/Home"
 import About from "./pages/About.js";
 
-import { Typography } from '@mui/material';
+import { Typography, Box, Fade } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -24,6 +25,7 @@ function App() {
   });
 
   const [bookData, setBookData] = useState([]);
+  const [appLoaded, setAppLoaded] = useState(false);
 
   useEffect(() => {
     csv(url, function(err, data) {
@@ -34,24 +36,32 @@ function App() {
       mappedData = mappedData.filter(onlyUnique);
 
       setBookData(mappedData);
-
-      console.log("Book Data loaded")
+      setAppLoaded(true);
     })
   }, []);
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-        <Navbar/>
 
-        <Typography variant="h1" align = "center" sx = {{p: 3}}>
-          From Books to Nooks
-        </Typography>
+      <Box sx = {{display: appLoaded ? "none" : "block"}}>
+        <FakeLanding />
+      </Box>
 
-        <Routes>
-          <Route path="/" element={<Home bookData = {bookData} />} />
-          <Route path="/About" element={<About />} />
-        </Routes>
+      <Fade in = {appLoaded} timeout={{ enter: 1500 }}>
+        <Box sx = {{display: appLoaded ? "block" : "none"}}>
+          <Navbar/>
+
+          <Typography variant="h1" align = "center" sx = {{p: 3}}>
+            From Books to Nooks
+          </Typography>
+
+          <Routes>
+            <Route path="/" element={<Home bookData = {bookData} />} />
+            <Route path="/About" element={<About />} />
+          </Routes>
+        </Box>
+      </Fade>
     </ThemeProvider>
   );
 }
