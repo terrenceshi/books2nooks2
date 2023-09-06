@@ -11,3 +11,16 @@
     - set playlist info to useState
     - create spotify playlist if not created yet
     - display data
+
+# Set up:
+
+Create an env file in root that looks like this:
+
+```
+REACT_APP_SPOTIFY_CLIENT_ID = ""
+REACT_APP_SPOTIFY_SECRET = ""
+REACT_APP_REDIRECT_URL = ""
+REACT_APP_USER_ID = ""
+```
+
+Mkdir data under src and add book_data (books_ix).
