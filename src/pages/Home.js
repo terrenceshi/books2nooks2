@@ -1,24 +1,14 @@
 import { useState } from 'react';
 
-import { Typography, Autocomplete, TextField, Button, Box, Skeleton } from '@mui/material';
-import { csv } from 'd3-request';
-import url from "../data/book_data.csv";
+import { Typography, Autocomplete, TextField, Button, Box, Skeleton, Fade } from '@mui/material';
 
-var bookData;
-
-csv(url, function(err, data) {
-    bookData = data.map((entry) => {
-        return entry.title;
-    });
-    console.log("book csv loaded")
-})
-
-function Home() {
+function Home({bookData}) {
     const [loading, setLoading] = useState(false);
     const [resultsLoaded, setResultsLoaded] = useState(false);
 
     const [disabledBtn, setDisabledBtn] = useState(true);
     const [inputValue, setInputValue] = useState("");
+    const [open, setOpen] = useState(false);
 
     const top100Films = [
         { label: 'The Shawshank Redemption', year: 1994 },
@@ -43,64 +33,82 @@ function Home() {
             pb: 16
         }}>
             <Autocomplete
-                disablePortal
-                options={top100Films}
+                open={open}
+                onClose={() => setOpen(false)}
+                onChange={(event, value) => {
+                    setInputValue(value);
+                    setDisabledBtn(false);
+                }}
+                onInputChange={(event, value) => {
+                    setInputValue(value);
+                    if (value.length > 2) {
+                        setOpen(true);
+                    } else {
+                        setOpen(false);
+                    }
+                }}
+                options={bookData}
                 sx={{ width: 700 }}
                 renderInput={(params) => <TextField {...params} label="Enter a book title" variant="outlined"/>}
             />
 
             <Box>
-                <Button variant="contained" disabled = {disabledBtn}>
+                <Button variant="contained" disabled = {disabledBtn} onClick = {() => console.log(inputValue)}>
                     Generate Playlist
                 </Button>
             </Box>
 
-            <Skeleton 
-                variant="rounded" 
-                width={700} 
-                height={400} 
-                sx = {{
-                    borderRadius: 4,
-                    display: loading ? "block" : "none"
-                }}
-            />
-
-            <Box sx = {{
-                display: resultsLoaded ? "flex" : "none",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 3
-            }}>
+            <Fade in = {loading} timeout={{ enter: 1500 }}>
                 <Box>
-                    <iframe
-                        title = "myFrame"
-                        src="https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"
-                        width = {700} 
-                        height="400" 
-                        frameBorder="0" 
-                        allowtransparency="true"
+                    <Skeleton 
+                        variant="rounded" 
+                        width={700} 
+                        height={400} 
+                        sx = {{
+                            display: loading ? "block" : "none",
+                            borderRadius: 4,
+                        }}
                     />
-                    
                 </Box>
+            </Fade>
 
-                <Typography variant = "h6">
-                    Don't like what you see?
-                </Typography>
+            <Fade in = {resultsLoaded} timeout={{ enter: 1500 }}>
+                <Box sx = {{
+                    display: resultsLoaded ? "flex" : "none",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 3
+                }}>
+                    <Box>
+                        <iframe
+                            title = "myFrame"
+                            src="https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"
+                            width = {700} 
+                            height="400" 
+                            frameBorder="0" 
+                            allowtransparency="true"
+                        />
+                        
+                    </Box>
 
-                <Autocomplete
-                    disablePortal
-                    options={top100Films}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="Enter your favorite genre" />}
-                />
+                    <Typography variant = "h6">
+                        Don't like what you see?
+                    </Typography>
 
-                <Button
-                    variant="contained"
-                >
-                    Search Genre
-                </Button>
-            </Box>
+                    <Autocomplete
+                        disablePortal
+                        options={top100Films}
+                        sx={{ width: 300 }}
+                        renderInput={(params) => <TextField {...params} label="Enter your favorite genre" />}
+                    />
 
+                    <Button
+                        variant="contained"
+                    >
+                        Search Genre
+                    </Button>
+                </Box>
+            </Fade>
         </Box>
     );
 }
