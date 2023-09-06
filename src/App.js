@@ -10,7 +10,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { Route, Routes } from 'react-router-dom';
-import { csv } from 'd3-request';
+import { text } from 'd3-request';
+import { csvParseRows } from 'd3';
 import url from "./data/book_data.csv";
 
 function onlyUnique(value, index, array) {
@@ -27,12 +28,11 @@ function App() {
   const [bookData, setBookData] = useState([]);
   const [appLoaded, setAppLoaded] = useState(false);
 
-  useEffect(() => {
-    csv(url, function(err, data) {
-      var mappedData = data.map((entry) => {
-          return entry.title;
-      });
+  //console.log(process.env.REACT_APP_SPOTIFY_CLIENT_ID)
 
+  useEffect(() => {
+    text(url, function(data) {
+      var mappedData = csvParseRows(data).map((entry) => entry[0]);
       mappedData = mappedData.filter(onlyUnique);
 
       setBookData(mappedData);
