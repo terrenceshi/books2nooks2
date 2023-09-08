@@ -26,3 +26,5 @@ yarn-error.log*
 # data
 *.pt
 *.csv
+
+.pynb_checkpoints/
