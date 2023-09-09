@@ -57,7 +57,11 @@ function App() {
           </Typography>
 
           <Routes>
-            <Route path="/" element={<Home bookData = {bookData} />} />
+            <Route path="/" element={
+              <Home 
+                bookData = {bookData}
+              />
+            } />
             <Route path="/About" element={<About />} />
           </Routes>
         </Box>

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import GetLinks from '../components/CreatePlaylist.js';
+
 import { Typography, Autocomplete, TextField, Button, Box, Skeleton, Fade } from '@mui/material';
 
 function Home({bookData}) {
@@ -24,6 +26,11 @@ function Home({bookData}) {
         }
     ];
 
+    function btnClick(){
+        const idx = bookData.indexOf(inputValue);
+        GetLinks(idx);
+    }
+
     return (
         <Box sx = {{
             display: "flex", 
@@ -41,7 +48,6 @@ function Home({bookData}) {
                     setDisabledBtn(false);
                 }}
                 onInputChange={(event, value) => {
-                    setDisabledBtn(true);
                     if (value.length > 2) {
                         setOpen(true);
                     } else {
@@ -54,7 +60,7 @@ function Home({bookData}) {
             />
 
             <Box>
-                <Button variant="contained" disabled = {disabledBtn || inputValue === null} onClick = {() => console.log(inputValue)}>
+                <Button variant="contained" disabled = {disabledBtn || inputValue === null} onClick = {btnClick}>
                     Generate Playlist
                 </Button>
             </Box>
