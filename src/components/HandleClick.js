@@ -191,7 +191,7 @@ async function refreshToken(){
     }
 }
 
-function timeout(delay: number) {
+function timeout(delay) {
     return new Promise( res => setTimeout(res, delay) );
 }
 

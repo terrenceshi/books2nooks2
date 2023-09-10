@@ -23,12 +23,25 @@ function App() {
     palette: {
       mode: 'dark',
     },
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 640,
+        md: 960,
+        lg: 1200,
+        xl: 1536,
+      },
+    },
   });
 
   const [bookData, setBookData] = useState([]);
   const [appLoaded, setAppLoaded] = useState(false);
 
-  //console.log(process.env.REACT_APP_SPOTIFY_CLIENT_ID)
+  const [loading, setLoading] = useState(false);
+  const [resultsLoaded, setResultsLoaded] = useState(false);
+  const [genreLoading, setGenreLoading] = useState(false);
+  const [playlistData, setPlaylistData] = useState({"default":"https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"})
+  const [genre, setGenre] = useState("default")
 
   useEffect(() => {
     text(url, function(data) {
@@ -41,7 +54,7 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={darkTheme} className = "app">
       <CssBaseline />
 
       <Box sx = {{display: appLoaded ? "none" : "block"}}>
@@ -49,10 +62,12 @@ function App() {
       </Box>
 
       <Fade in = {appLoaded} timeout={{ enter: 1500 }}>
-        <Box sx = {{display: appLoaded ? "block" : "none"}}>
+        <Box sx = {{
+          display: appLoaded ? "block" : "none",
+        }}>
           <Navbar/>
 
-          <Typography variant="h1" align = "center" sx = {{p: 3}}>
+          <Typography align = "center"  sx={{p: 3, typography: { md: 'h1', sm: 'h2', xs: 'h3' } }}>
             From Books to Nooks
           </Typography>
 
@@ -60,6 +75,16 @@ function App() {
             <Route path="/" element={
               <Home 
                 bookData = {bookData}
+                loading = {loading}
+                setLoading = {setLoading}
+                resultsLoaded = {resultsLoaded}
+                setResultsLoaded = {setResultsLoaded}
+                genreLoading = {genreLoading}
+                setGenreLoading = {setGenreLoading}
+                playlistData = {playlistData}
+                setPlaylistData = {setPlaylistData}
+                genre = {genre}
+                setGenre = {setGenre}
               />
             } />
             <Route path="/About" element={<About />} />
