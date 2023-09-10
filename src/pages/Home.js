@@ -1,34 +1,31 @@
 import { useState } from 'react';
 
-import GetLinks from '../components/CreatePlaylist.js';
+import HandleClick from '../components/HandleClick.js';
 
-import { Typography, Autocomplete, TextField, Button, Box, Skeleton, Fade } from '@mui/material';
+import { Typography, Autocomplete, TextField, Button, Box, Skeleton, Fade, styled } from '@mui/material';
+
+const MuiIFrame = styled("iframe")({});
 
 function Home({bookData}) {
     const [loading, setLoading] = useState(false);
     const [resultsLoaded, setResultsLoaded] = useState(false);
+    const [genreLoading, setGenreLoading] = useState(false);
 
     const [disabledBtn, setDisabledBtn] = useState(true);
     const [inputValue, setInputValue] = useState("");
     const [open, setOpen] = useState(false);
 
-    const top100Films = [
-        { label: 'The Shawshank Redemption', year: 1994 },
-        { label: 'The Godfather', year: 1972 },
-        { label: 'The Godfather: Part II', year: 1974 },
-        { label: 'The Dark Knight', year: 2008 },
-        { label: '12 Angry Men', year: 1957 },
-        { label: "Schindler's List", year: 1993 },
-        { label: 'Pulp Fiction', year: 1994 },
-        {
-          label: 'The Lord of the Rings: The Return of the King',
-          year: 2003,
-        }
-    ];
+    const [playlistData, setPlaylistData] = useState({"default":"https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"})
+    const [genre, setGenre] = useState("default")
+    const [disabledBtn2, setDisabledBtn2] = useState(true);
 
     function btnClick(){
         const idx = bookData.indexOf(inputValue);
-        GetLinks(idx);
+        HandleClick(idx, setLoading, setResultsLoaded, setPlaylistData);
+    }
+
+    function timeout(delay: number) {
+        return new Promise( res => setTimeout(res, delay) );
     }
 
     return (
@@ -65,20 +62,6 @@ function Home({bookData}) {
                 </Button>
             </Box>
 
-            <Fade in = {loading} timeout={{ enter: 1500 }}>
-                <Box>
-                    <Skeleton 
-                        variant="rounded" 
-                        width={700} 
-                        height={400} 
-                        sx = {{
-                            display: loading ? "block" : "none",
-                            borderRadius: 4,
-                        }}
-                    />
-                </Box>
-            </Fade>
-
             <Fade in = {resultsLoaded} timeout={{ enter: 1500 }}>
                 <Box sx = {{
                     display: resultsLoaded ? "flex" : "none",
@@ -86,34 +69,57 @@ function Home({bookData}) {
                     alignItems: "center",
                     gap: 3
                 }}>
-                    <Box>
-                        <iframe
+                    <Fade in = {loading || genreLoading} timeout={{ enter: 1500 }}>
+                        <Skeleton 
+                            variant="rounded" 
+                            width={700} 
+                            height={400} 
+                            sx = {{
+                                display: loading || genreLoading ? "block" : "none",
+                                borderRadius: 4,
+                            }}
+                        />
+                    </Fade>
+
+                    <Fade in = {!loading && !genreLoading} timeout={{ enter: 1500 }}>
+                        <MuiIFrame
                             title = "myFrame"
-                            src="https://open.spotify.com/embed/user/spotify/playlist/0ZtNpjS6cTeLIa1KpQ4cpp"
-                            width = {700} 
-                            height="400" 
+                            id="spotifyPlaylist"
+                            src= {playlistData[genre]}
                             frameBorder="0" 
                             allowtransparency="true"
+                            sx = {{
+                                width: 700,
+                                height: 400,
+                                display: !loading && !genreLoading ? "block" : "none"
+                        }}/>
+                    </Fade>
+
+                    <Box sx = {{
+                        display: !loading ? "flex" : "none",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 3
+                    }}>
+                        <Typography variant = "h6">
+                            Don't like what you see?
+                        </Typography>
+
+                        <Autocomplete
+                            disableClearable
+                            options={Object.keys(playlistData).map((entry) => {
+                                return entry.charAt(0).toUpperCase() + entry.slice(1)
+                            })}
+                            onChange={async (event, value) => {
+                                setGenreLoading(true);
+                                setGenre(value.toLowerCase());
+                                await timeout(750);
+                                setGenreLoading(false);
+                            }}
+                            sx={{ width: 300 }}
+                            renderInput={(params) => <TextField {...params} label="Select your favorite genre" />}
                         />
-                        
                     </Box>
-
-                    <Typography variant = "h6">
-                        Don't like what you see?
-                    </Typography>
-
-                    <Autocomplete
-                        disablePortal
-                        options={top100Films}
-                        sx={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="Enter your favorite genre" />}
-                    />
-
-                    <Button
-                        variant="contained"
-                    >
-                        Search Genre
-                    </Button>
                 </Box>
             </Fade>
         </Box>

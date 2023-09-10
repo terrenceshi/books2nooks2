@@ -7,20 +7,20 @@ import data13200 from '../data/data_13200.json';
 import {Buffer} from 'buffer';
 import axios from 'axios';
 
-async function getToken(){
-    // Returns token if successfull
+async function getRefreshToken(){
+    // Returns access token and refresh token if successfull
     // Returns -1 if issues connecting to Spotify API
 
     var authentication = Buffer.from(process.env.REACT_APP_SPOTIFY_CLIENT_ID + ":" + process.env.REACT_APP_SPOTIFY_SECRET).toString("base64");
 
-    console.log(process.env.REACT_APP_AUTHORIZATION_CODE)
+    const tokenUrl = 'https://accounts.spotify.com/api/token';
+    const authCode = ""
 
-    const tokenUrl = 'https://accounts.spotify.com/api/token'
     try {
         var response = await axios.post(tokenUrl, {
             'grant_type': 'authorization_code',
             'scope': 'playlist-modify-public',
-            'code': 'AQCe24EzHqxiAxSEQQf5Rtbo9H_-s8gwJtRmPxicHs-Jd19vAiUT-CfW9AsOHLWGhWJjZsrIST8lXGe44pp6-iESZ2VlTc00jwneAS3QlGJ4BMwLvAMZ5J0soRimJcvqMlcttd-9ZBFu8tg5eprkUvga6w9PZBJLK_jlFYoMeE-tLtlEbtYuHPh3ueVdMD7VnrPKaSMi1a8XVg',
+            'code': authCode,
             'redirect_uri': process.env.REACT_APP_REDIRECT_URL
         }, {
             headers: { 
@@ -31,7 +31,7 @@ async function getToken(){
 
         console.log(response)
 
-        return response.data.access_token;
+        return [response.data.access_token, response.data.refresh_token];
     } catch (error) {
         console.log(error);
         return -1
@@ -59,8 +59,6 @@ async function lookForPlaylist(token, bookName){
                     offset: os
                 }
             })
-
-            console.log(response)
 
             var items = response.data.items;
 
@@ -91,8 +89,6 @@ async function addSongsToPlaylist(token, playlistId, uriLst){
     // Returns 1 if success
     // Returns -1 if errors connecting to spotify API
 
-    console.log('add songs to playlist')
-
     var addUrl = "https://api.spotify.com/v1/playlists/"+playlistId+"/tracks"
 
     var responseData = -1;
@@ -109,7 +105,6 @@ async function addSongsToPlaylist(token, playlistId, uriLst){
           }
         }
     ).then(function(response){
-        console.log(response);
         responseData = response.data;
     }).catch(function(error){
         console.log(error);
@@ -125,8 +120,6 @@ async function addSongsToPlaylist(token, playlistId, uriLst){
 async function createPlaylist(token, data, genre, bookName){
     // Returns link to playlist if success
     // Returns -1 if issues connecting to Spotify API
-
-    console.log("Create playlist " + genre)
 
     const createUrl = "https://api.spotify.com/v1/users/"+process.env.REACT_APP_USER_ID+"/playlists";
 
@@ -148,7 +141,6 @@ async function createPlaylist(token, data, genre, bookName){
           }
         }
     ).then(function(response){
-        console.log(response);
         responseData = response.data;
     }).catch(function(error){
         console.log(error);
@@ -173,9 +165,47 @@ async function createPlaylist(token, data, genre, bookName){
     return playlistLink;
 }
 
-const GetLinks = async function(idx) {
+async function refreshToken(){
+    // Returns token if successfull
+    // Returns -1 if issues connecting to Spotify API
+
+    var authentication = Buffer.from(process.env.REACT_APP_SPOTIFY_CLIENT_ID + ":" + process.env.REACT_APP_SPOTIFY_SECRET).toString("base64");
+
+    const tokenUrl = 'https://accounts.spotify.com/api/token'
+
+    try {
+        var response = await axios.post(tokenUrl, {
+            'grant_type': 'refresh_token',
+            refresh_token: process.env.REACT_APP_REFRESH_TOKEN
+        }, {
+            headers: { 
+                Authorization: "Basic " + authentication,
+                'Content-Type': 'application/x-www-form-urlencoded' 
+            }
+        })
+
+        return response.data.access_token;
+    } catch (error) {
+        console.log(error);
+        return -1
+    }
+}
+
+function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+}
+
+const HandleClick = async function(idx, setLoading, setResultsLoaded, setPlaylistData) {
     // Returns dict where key = genre and val = link
     // Returns -1 errors connecting to Spotify API
+
+    // UNCOMMENT THIS IF YOUR REFRESH TOKEN NEEDS REPLACING
+    // var tokens = await getRefreshToken()
+    // console.log("regular token: " + tokens[0])
+    // console.log("refresh token: " + tokens[1])
+
+    setLoading(true);
+    setResultsLoaded(true);
 
     let data;
 
@@ -193,19 +223,16 @@ const GetLinks = async function(idx) {
 
     var bookName = data.name;
 
-    var token = await getToken();
-
-    console.log("TOKEN: "+token)
+    var token = await refreshToken();
 
     if(token === -1){
         return -1;
     }
 
-    var output = await lookForPlaylist(token, bookName) // dictionary where key = genre and val = link to playlist. Empty if playlist is not in library.
+    var output = await lookForPlaylist(token, bookName)
 
     if(Object.keys(output).length === 0){
         // No playlist yet, need to make them
-        console.log("hery")
 
         // Iterate through genres and make playlists
         for(let i = 0; i < Object.keys(data).length; i++){
@@ -223,14 +250,29 @@ const GetLinks = async function(idx) {
 
             output[genre] = playlistLink;
         }
-    } else {
-        // If book already has generated playlists, just return links
-        console.log(output);
     }
 
-    return output;
+    Object.keys(output).forEach(function(key, index) {
+        var lastIdx = output[key].lastIndexOf("/");
+        output[key] = "https://open.spotify.com/embed/user/spotify/playlist" + output[key].slice(lastIdx);
+    });
 
-    // Output should be dict: key = genre, value = link
+    output = Object.keys(output).sort().reduce(
+        (obj, key) => { 
+            obj[key] = output[key]; 
+            return obj;
+        }, 
+        {}
+    );
+
+    setPlaylistData(output);
+
+    await timeout(500);
+
+    setLoading(false);
+    setResultsLoaded(true);
+
+    return output;
 }
 
-export default GetLinks;
+export default HandleClick;
