@@ -10,18 +10,25 @@ function FakeLanding() {
         gap: 3,
         pt: "68.5px"
     }}>
-        <Box sx = {{pb: 1, pt: 6}}>
+        <Box sx = {{
+            pb: 1, 
+            pt: {md: 6, sm: 4, xs: 4}
+        }}>
             <Skeleton 
                 variant="rounded" 
-                width={860} 
-                height={80} 
+                sx = {{
+                    width: {md: 860, sm: 560, xs: 400},
+                    height: {md: 80, sm: 60, xs: 56}
+                }}
             />
         </Box>
 
         <Skeleton 
             variant="rounded" 
-            width={700} 
-            height={56} 
+            sx = {{
+                width:{md: 700, sm: 500, xs: 300},
+                height: 56
+            }}
         />
         <Skeleton 
             variant="rounded" 

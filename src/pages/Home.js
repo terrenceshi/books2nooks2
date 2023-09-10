@@ -80,11 +80,11 @@ function Home({bookData, loading, setLoading, resultsLoaded, setResultsLoaded, g
                         <Fade in = {loading || genreLoading} timeout={{ enter: 1500 }}>
                             <Skeleton 
                                 variant="rounded" 
-                                width={700} 
-                                height={400} 
                                 sx = {{
                                     display: loading || genreLoading ? "block" : "none",
                                     borderRadius: 4,
+                                    height: 400,
+                                    width: {md: 700, sm: 500, xs: 300}
                                 }}
                             />
                         </Fade>
