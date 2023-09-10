@@ -10,10 +10,16 @@ function Home({bookData, loading, setLoading, resultsLoaded, setResultsLoaded, g
     const [disabledBtn, setDisabledBtn] = useState(true);
     const [inputValue, setInputValue] = useState("");
     const [open, setOpen] = useState(false);
+    const [cantConnect, setCantConnect] = useState(false);
 
-    function btnClick(){
+    async function btnClick(){
         const idx = bookData.indexOf(inputValue);
-        HandleClick(idx, setLoading, setResultsLoaded, setPlaylistData);
+        var hc = await HandleClick(idx, setLoading, setResultsLoaded, setPlaylistData);
+        if(hc === -1){
+            // Handle spotify api error
+            setLoading(false);
+            setCantConnect(true);
+        }
     }
 
     function timeout(delay) {
@@ -54,6 +60,15 @@ function Home({bookData, loading, setLoading, resultsLoaded, setResultsLoaded, g
                         Generate Playlist
                     </Button>
                 </Box>
+
+                <Fade in = {cantConnect} timeout={{ enter: 1500 }}>
+                    <Typography variant = "h5" align = "center" sx={{ 
+                        width: {md: 700, sm: 500, xs: 300},
+                        display: cantConnect ? "block" : "none"
+                    }}>
+                        Issues connecting to spotify backend. Try again later or contact me at terrenceshi@gmail.com if the issue persists.
+                    </Typography>
+                </Fade>
 
                 <Fade in = {resultsLoaded} timeout={{ enter: 1500 }}>
                     <Box sx = {{

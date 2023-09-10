@@ -231,6 +231,10 @@ const HandleClick = async function(idx, setLoading, setResultsLoaded, setPlaylis
 
     var output = await lookForPlaylist(token, bookName)
 
+    if(output === -1){
+        return -1;
+    }
+
     if(Object.keys(output).length === 0){
         // No playlist yet, need to make them
 
@@ -270,7 +274,6 @@ const HandleClick = async function(idx, setLoading, setResultsLoaded, setPlaylis
     await timeout(500);
 
     setLoading(false);
-    setResultsLoaded(true);
 
     return output;
 }

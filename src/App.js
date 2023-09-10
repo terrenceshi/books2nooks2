@@ -54,7 +54,7 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={darkTheme} className = "app">
+    <ThemeProvider theme={darkTheme}>
       <CssBaseline />
 
       <Box sx = {{display: appLoaded ? "none" : "block"}}>
