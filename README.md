@@ -17,9 +17,11 @@ You'll have to ask me for the values of the env file.
 ## Include data files
 Mkdir data under src and add book_data.csv (books_ix) as well as data_0.json, data_3300.json, data_6600.json, data_9900.json, data_13200.json.
 
+https://drive.google.com/file/d/1BSiY4vjxmMhCEU3KkLRfEqskoiInYG8_/view?usp=sharing
+
 For research (not needed for software dev, only used to construct the json files), you'll need books_ix.csv, combinedMusicData_small, H_rank100.pt, W_rank100.pt.
 
-You'll have to ask me for these data files.
+https://drive.google.com/file/d/1JrFoQUnzIGA9BRYdhsWnlfgMGopDDYOM/view?usp=sharing
 
 # Data
 
